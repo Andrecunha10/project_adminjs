@@ -17,6 +17,7 @@ export class Mail {
     }
 
     public async sendMail(name: string, email: string, pin: string): Promise<void>{
+        //TODO: CRIAR TEMPLATE
 
         const url = process.env.URL_CONFIRM_EMAIL
 

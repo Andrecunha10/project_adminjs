@@ -42,7 +42,8 @@ User.init(
         },
         email: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            unique: true
         },
         userName: {
             type: DataTypes.STRING,
@@ -62,7 +63,7 @@ User.init(
             defaultValue: false
         },
         pin: {
-            type: DataTypes.STRING(4),
+            type: DataTypes.STRING(6),
             allowNull: true
         },
         createdAt: {            

@@ -18,48 +18,20 @@ import hbs from 'hbs';
 import { UserController } from './controller/usercontroller';
 const path = require('node:path');
 
-
 require('dotenv').config();
 
 const PORT = process.env.PORT_HOST;
 const userCtrl = new UserController();
 
-const cookieKey = (): string => {
-    const value = process.env.COOKIE_KEY;
+import cookieKey from './utils/cookieKey';
+import setResources from './utils/setResources';
 
-    if (value) {
-        return value
-    }
-
-    return ''
-}
 
 AdminJS.registerAdapter({
     Resource: AdminJSSequelize.Resource,
     Database: AdminJSSequelize.Database
 })
 
-const setResources = (model: object, hideElemens: object | null = null, actions: object | null = null) => {
-    return {
-        resource: model,
-        options: {
-            properties: {
-                ...hideElemens,
-                createdAt: {
-                    isVisible: {
-                        list: false, edit: false, create: false, show: true
-                    }                
-                },
-                updatedAt: {
-                    isVisible: {
-                        list: false, edit: false, create: false, show: true
-                    },
-                }
-            },
-            actions: actions
-        },
-    }
-}
 
 const start = async () => {
     const adminOptions = {
@@ -94,31 +66,32 @@ const start = async () => {
                 {
                     new: {
                         before: async (request: any) => {
-                            const user = await User.findOne({
-                                where: {
-                                    email: request.payload.email
-                                }
-                            })
-                            if(user) {
-                                throw new ValidationError({
-                                    email: {
-                                        message: 'User Already Exists!'
-                                    }
-                                })
-                            }                             
+                            // const user = await User.findOne({
+                            //     where: {
+                            //         email: request.payload.email
+                            //     }
+                            // })
+                            // if(user) {
+                            //     throw new ValidationError({
+                            //         email: {
+                            //             message: 'User Already Exists!'
+                            //         }
+                            //     })
+                            // }                             
                             request.payload.encryptedPassword = await bcrypt.hash(request.payload.password, 10);
                             request.payload.pin = Math.floor(100000 + Math.random() * 900000).toString();
 
                             userCtrl.sendToken(request.payload);
-                    
 
+                            console.log(request.payload);
+                    
                             return request;
                         }
                     },
                     edit: {
                         before: async (request: any) => {
                             if (request.payload.password) {
-                                request.payload.encryptedPassword = await bcrypt.hash(request.payload.password, process.env.BCRYPT_SALT)
+                                request.payload.encryptedPassword = await bcrypt.hash(request.payload.password, 10)
                             }
                             return request
                         }
@@ -139,6 +112,7 @@ const start = async () => {
     };
 
     const app = express();
+   
     db.sync()
             .then(result => console.log("Acessou o DB"))
             .catch(err => console.log(err)); 
@@ -168,11 +142,14 @@ const start = async () => {
                 if (user){
                     const verifyPassword = await bcrypt.compare(password, user.encryptedPassword);
                     if(verifyPassword) {
+                        // if (user.role === 'user'){
+                        //    return
+                        // }
                         if(user.active){
                             return user
                         }else{
                             userCtrl.sendToken(user);
-                            return user
+                            return false
                         }                        
                     }
                 }
@@ -193,18 +170,13 @@ const start = async () => {
             name: 'adminjs'
         },
     );
+    
     app.use(express.json());
     hbs.registerPartials(path.join(__dirname, 'views'));
     app.set('view engine', 'hbs');
     app.use(admin.options.rootPath, adminRouter);
     app.use(bodyParser.urlencoded({extended: true}));
     app.use('/auth', auth);
-
-    // app.get('/favicon', (req, res) => {  
-    //     return res.render('favicon', {
-    //         image: './public/favicon.png'
-    //     })
-    // })
 
     app.listen(PORT, () => {
         console.log(`Projeto rodando na porta ${PORT}`)

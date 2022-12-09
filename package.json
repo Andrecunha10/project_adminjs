@@ -16,22 +16,28 @@
     "adminjs": "^6.5.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
+    "chart.js": "^4.0.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-formidable": "^1.2.0",
     "express-mysql-session": "^2.1.8",
     "express-session": "^1.17.3",
     "hbs": "^4.2.0",
+    "moment": "^2.29.4",
     "mysql2": "^2.3.3",
     "nodemailer": "^6.8.0",
     "nodemailer-express-handlebars": "^5.0.0",
+    "react-chartjs-2": "^5.0.1",
     "sequelize": "^6.25.3",
+    "swr": "^1.3.0",
     "tslib": "^2.4.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@types/body-parser": "^1.19.2",
     "@types/express": "^4.17.14",
     "@types/express-session": "^1.17.5",
+    "@types/faker": "^6.6.9",
     "@types/hbs": "^4.0.1"
   }
 }

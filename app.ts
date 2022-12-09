@@ -107,7 +107,7 @@ const start = async () => {
         branding:{
             logo: 'https://latuapizza.netlify.app/static/media/logo_mobile.71fcb308b79062714ab8c07b745dc9a0.svg',
             companyName: 'La Tua Pizza',
-            favicon: 'https://cdn.icon-icons.com/icons2/2113/PNG/512/pizza_icon_131067.png'
+            favicon: '/static/favicon.ico'
         }
     };
 
@@ -177,7 +177,7 @@ const start = async () => {
     app.use(admin.options.rootPath, adminRouter);
     app.use(bodyParser.urlencoded({extended: true}));
     app.use('/auth', auth);
-
+    app.use('/static', express.static('public'));
     app.listen(PORT, () => {
         console.log(`Projeto rodando na porta ${PORT}`)
     });

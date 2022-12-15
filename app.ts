@@ -1,8 +1,9 @@
 import AdminJS, { ValidationError } from 'adminjs';
 import AdminJSExpress from '@adminjs/express';
 import express from 'express';
-import db from './db';
+import {sequelize, mongoDB} from './db';
 import * as AdminJSSequelize from '@adminjs/sequelize';
+import * as AdminJSMongoose from '@adminjs/mongoose';
 import bodyParser from 'body-parser';
 const bcrypt = require('bcrypt');
 
@@ -12,10 +13,13 @@ const MySQLStore = require('express-mysql-session')(session);
 import { Category } from "./model/category.entity";
 import { Product } from './model/products.entity';
 import { User } from './model/user.entity';
+import { ReportCategory } from './model/reportCategory.entity';
+import { ReportProduct } from './model/reportProduct.entity';
+import { ReportUser } from './model/reportUser.entity';
 
 import {auth} from './routes/auth';
 import hbs from 'hbs';
-import { UserController } from './controller/usercontroller';
+import { UserController } from './controller/userController';
 const path = require('node:path');
 
 require('dotenv').config();
@@ -25,17 +29,31 @@ const userCtrl = new UserController();
 
 import cookieKey from './utils/cookieKey';
 import setResources from './utils/setResources';
+import { report } from './routes/report';
+
+sequelize.sync()
+    .then(result => console.log("Acessou o Sequelize."))
+    .catch(err => console.log(err));
+
+mongoDB();
 
 
 AdminJS.registerAdapter({
     Resource: AdminJSSequelize.Resource,
     Database: AdminJSSequelize.Database
-})
+});
 
+AdminJS.registerAdapter({
+    Resource: AdminJSMongoose.Resource,
+    Database: AdminJSMongoose.Database
+  });
 
 const start = async () => {
     const adminOptions = {
         resources:[
+            setResources(ReportCategory),
+            setResources(ReportProduct),
+            setResources(ReportUser),
             setResources(Category),
             setResources(Product),
             setResources(User, 
@@ -82,8 +100,6 @@ const start = async () => {
                             request.payload.pin = Math.floor(100000 + Math.random() * 900000).toString();
 
                             userCtrl.sendToken(request.payload);
-
-                            console.log(request.payload);
                     
                             return request;
                         }
@@ -113,10 +129,6 @@ const start = async () => {
 
     const app = express();
    
-    db.sync()
-            .then(result => console.log("Acessou o DB"))
-            .catch(err => console.log(err)); 
-
     const admin = new AdminJS(adminOptions);
 
     const sessionStore = new MySQLStore({
@@ -177,6 +189,7 @@ const start = async () => {
     app.use(admin.options.rootPath, adminRouter);
     app.use(bodyParser.urlencoded({extended: true}));
     app.use('/auth', auth);
+    app.use('/report', report);
     app.use('/static', express.static('public'));
     app.listen(PORT, () => {
         console.log(`Projeto rodando na porta ${PORT}`)

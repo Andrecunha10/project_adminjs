@@ -1,6 +1,5 @@
 import {useState, useEffect} from 'react';
 import moment from 'moment';
-import useSWR from 'swr';
 import { BarChart } from './barChart';
 import { PieChart } from './pieChart';
 import { RadarChart } from './radarChart';
@@ -22,14 +21,12 @@ const item = {
     width: '100%',
 };
 
-const fetcher = (...args) => fetch(...args).then(res => res.json())
-
 const Dashboard = () => {
 
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [selectDate, setSelectDate] = useState("custom");
-
+    const [selectDate, setSelectDate] = useState("7");
+   
 
     useEffect(() => {
         if(selectDate !== 'custom') {
@@ -72,7 +69,7 @@ const Dashboard = () => {
                     onChange = {(e) => setSelectDate(e.target.value)}                
                 >
                     <option value='custom'>Customizado</option>
-                    <option value='7'>7 dias</option>
+                    <option value='7' selected>7 dias</option>
                     <option value='15'>15 dias</option>
                     <option value='30'>1 mês</option>
                     <option value='180'>6 mesês</option>
@@ -81,16 +78,17 @@ const Dashboard = () => {
             </div>
             <div>
                 <div style={col}>
-                    <PieChart />
+
+                    <PieChart startDate={startDate} endDate={endDate} selectDate={selectDate}/>                  
                 </div>
                 <div style={col}>
-                    <RadarChart />
+                    <RadarChart startDate={startDate} endDate={endDate} selectDate={selectDate}/>
                 </div>
                 <div style={{
                     ...col,
                     width: '100%'
                 }}>
-                    <BarChart />
+                    <BarChart startDate={startDate} endDate={endDate} selectDate={selectDate}/>
                 </div>
             </div>
         </>

@@ -1,5 +1,5 @@
 import { Optional, Model, DataTypes } from "sequelize";
-import db from '../db'
+import {sequelize} from '../db'
 
 
 interface ICategory {
@@ -37,7 +37,7 @@ Category.init(
         },
     },
     {
-        sequelize: db,
+        sequelize,
         tableName: 'categories',
         modelName: 'category'
     }

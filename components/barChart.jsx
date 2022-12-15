@@ -8,7 +8,7 @@ import {
     Legend,
   } from 'chart.js';
   import { Bar } from 'react-chartjs-2';
-  import { faker } from '@faker-js/faker';
+import { useDataRport } from '../utils/useReportData.ts';
 
 ChartJS.register(
     CategoryScale,
@@ -27,23 +27,27 @@ const options = {
       },
       title: {
         display: true,
-        text: 'Chart.js Bar Chart',
+        text: 'Usuários nos últimos 12 meses',
       },
     },
   };
+
   
-const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+export const BarChart = ({ startDate, endDate, selectDate }) => {
+  const { dataReport, error, isLoading } = useDataRport('users', startDate, endDate, selectDate);
+
   
 const data = {
-    labels,
+    labels: dataReport?.label,
     datasets: [
       {
-        label: 'Dataset 1',
-        data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
+        label: 'Usuários em quantidade.',
+        data: dataReport?.data,
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
       }
     ],
   };  
-export const BarChart = () => {
+  if (isLoading) return <p>Carregando...</p>
+  if (error) return <p>Erro ao realizar requisição. Tente novamente.</p>
   return <Bar options={options} data={data} />;
 }

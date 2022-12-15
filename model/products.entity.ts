@@ -1,5 +1,5 @@
 import { Optional, Model, DataTypes } from 'sequelize';
-import db from '../db';
+import {sequelize} from '../db'
 
 interface IProduct {
     id: number,
@@ -58,7 +58,7 @@ Product.init(
         }
     },
     {
-        sequelize: db,
+        sequelize,
         tableName: 'products',
         modelName: 'product'
     }

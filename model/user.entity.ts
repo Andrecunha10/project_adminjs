@@ -1,5 +1,5 @@
  import {Model, Optional, DataTypes} from 'sequelize';
- import db from '../db'
+ import {sequelize} from '../db';
 
  export interface IUser {
     id: number;
@@ -75,7 +75,7 @@ User.init(
 
     },
     {
-        sequelize: db,
+        sequelize,
         tableName: 'users',
         modelName: 'user'
     }
